@@ -16,7 +16,7 @@ const bancoPalavras = [
   { palavra: "MONTANHA", dica: "Grande elevação natural do terreno" },
   { palavra: "RIO", dica: "Água corrente natural" },
   { palavra: "GELADEIRA", dica: "Aparelho para conservar alimentos" },
-  { palavra: "FELIZ", dica: "Sentimento de alegria" },
+  { palavra: "FELIZ", dica: "Sentimento de agradável" },
   { palavra: "TRABALHO", dica: "Atividade remunerada" },
   { palavra: "AMIGO", dica: "Pessoa querida e companheira" },
   { palavra: "ESPELHO", dica: "Mostra seu reflexo" },
@@ -48,31 +48,32 @@ const bancoPalavras = [
   { palavra: "FLORESTA", dica: "Lugar com muitas árvores" }
 ];
 
-
-
+// variaveis do jogo
 const maxErros = 6;
 let erros;
 let letrasCorretas;
 let palavraSecreta = '';
 let dica = '';
 let modoJogo = '';
-let letrasUsadas = new Set(); // <<< ADICIONE ESTA LINHA
+let letrasUsadas = new Set();
+const palavrasUsadas = new Set();
 
 
-// --- Variáveis de Sessão ---
-// Para 2 Jogadores
+
+// variáveis de sessão 
+// para 2 jogadores
 let jogador1 = { nome: '', pontuacao: 0 };
 let jogador2 = { nome: '', pontuacao: 0 };
-let definidorDaPalavra; // Guarda 1 ou 2
+let definidorDaPalavra; 
 
-// Para 1 Jogador
+// para 1 jogador
 let jogadorSolo = { nome: '', pontuacao: 0 };
 
-// Para o Timer
+// para o timer
 let timer;
 let tempoRestante;
 
-// --- Elementos do DOM ---
+// elementos do dom
 const telaInicial = document.getElementById('tela-inicial');
 const btnSolo = document.getElementById('btn-solo');
 const btnDois = document.getElementById('btn-dois');
@@ -87,33 +88,38 @@ const mensagemDiv = document.getElementById('mensagem');
 const petalas = document.querySelectorAll('.petala');
 const btnReiniciar = document.getElementById('btn-reiniciar');
 const btnContinuar = document.getElementById('btn-continuar');
+const gameArea = document.getElementById('gameArea');
+const infoPartida = document.getElementById('info-partida');
+const letrasUsadasContainer = document.getElementById('letras-usadas-container');
+const placarJ1 = document.getElementById('placar-j1');
+const placarJ2 = document.getElementById('placar-j2');
+const displayLetrasUsadas = document.getElementById('letras-usadas');
+
 
 // ==================================================================
-// INÍCIO DO JOGO E SELEÇÃO DE MODO
+// inicio do jogo e seleção do modo
 // ==================================================================
 
-// NOVO: Event listener para o teclado físico
+// event listener para o teclado físico
 document.addEventListener('keydown', (e) => {
-    // Só funciona se a tela do jogo estiver ativa
     if (document.getElementById('gameArea').style.display !== 'block' || mensagemDiv.textContent.includes('ganhou') || mensagemDiv.textContent.includes('perdeu') || mensagemDiv.textContent.includes('descobe')) {
         return;
     }
 
     const letra = e.key.toUpperCase();
 
-    // Valida se é uma letra de A-Z (e não uma tecla como Shift, etc.)
     if (letra.length === 1 && letra >= 'A' && letra <= 'Z') {
         
-        // Se a letra já foi usada, não faz nada
+        // se a letra já foi usada, não faz nada
         if (letrasUsadas.has(letra)) {
             return;
         }
 
-        // Adiciona a letra ao conjunto de usadas e atualiza o display
+        // adiciona a letra ao conjunto de usadas e atualiza o display
         letrasUsadas.add(letra);
         atualizarLetrasUsadas();
 
-        // Roda a lógica do jogo com a nova letra
+        // roda a lógica do jogo com a nova letra
         verificarLetra(letra);
     }
 });
@@ -125,7 +131,7 @@ btnSolo.addEventListener('click', () => {
         return;
     }
     
-    jogadorSolo = { nome: nome.trim(), pontuacao: 0 };
+    jogadorSolo = { nome: nome.trim().toUpperCase(), pontuacao: 0 };
     modoJogo = 'solo';
     
     const escolha = bancoPalavras[Math.floor(Math.random() * bancoPalavras.length)];
@@ -143,8 +149,8 @@ btnDois.addEventListener('click', () => {
     const nomeJ2 = prompt("Digite o nome do Jogador 2:");
     if (!nomeJ2 || nomeJ2.trim() === "") return alert("Nome inválido.");
 
-    jogador1 = { nome: nomeJ1.trim(), pontuacao: 0 };
-    jogador2 = { nome: nomeJ2.trim(), pontuacao: 0 };
+    jogador1 = { nome: nomeJ1.trim().toUpperCase(), pontuacao: 0 };
+    jogador2 = { nome: nomeJ2.trim().toUpperCase(), pontuacao: 0 };
     definidorDaPalavra = 1;
     modoJogo = 'dois';
 
@@ -153,6 +159,8 @@ btnDois.addEventListener('click', () => {
     
     const labelPalavra = document.querySelector('#form-dois-jogadores label[for="input-palavra"]');
     labelPalavra.textContent = `Vez de ${jogador1.nome}: Digite a palavra secreta:`;
+    labelPalavra.innerHTML = `${jogador1.nome} escolhe a palavra e ${jogador2.nome} tenta adivinhar a palavra <br/><br/>Digite a palavra secreta:`;
+
 });
 
 formDoisJogadores.addEventListener('submit', (e) => {
@@ -162,7 +170,7 @@ formDoisJogadores.addEventListener('submit', (e) => {
     if (!palavraInput || !dicaInput) return alert('Preencha palavra e dica!');
 
     if (!/^[a-zA-ZÀ-ÿ\s\-]+$/.test(palavraInput)) {
-        return alert('Palavra deve conter apenas letras e espaços.');
+        return alert('Palavra deve conter apenas letras, espaços e hífens.');
     }
 
     palavraSecreta = palavraInput.toUpperCase().replace(/\s+/g, '-');
@@ -171,28 +179,94 @@ formDoisJogadores.addEventListener('submit', (e) => {
     formDoisJogadores.style.display = 'none';
 });
 
+
+btnContinuar.addEventListener('click', () => {
+  if (modoJogo === 'solo') {
+    const escolha = sortearPalavraNova();
+    if (!escolha) {
+      // todas as palavras já foram usadas, encerra o jogo
+      mensagemDiv.textContent = 'Parabéns! Você já adivinhou todas as palavras disponíveis.';
+      mensagemDiv.style.color = '#004d40';
+      finalizarJogo();
+      return;
+    }
+    palavraSecreta = escolha.palavra.toUpperCase().replace(/\s+/g, '-');
+    dica = escolha.dica;
+    iniciarJogo();
+  }else if (modoJogo === 'dois') {
+        definidorDaPalavra = definidorDaPalavra === 1 ? 2 : 1; 
+        inputPalavra.value = '';
+        inputDica.value = '';
+        formDoisJogadores.style.display = 'flex';
+
+        gameArea.style.display = 'none';
+        
+        const proximoDefinidor = definidorDaPalavra === 1 ? jogador1.nome : jogador2.nome;
+        const proximoAdidvinhador = definidorDaPalavra === 1 ? jogador2.nome : jogador1.nome;
+
+        document.querySelector('#form-dois-jogadores label[for="input-palavra"]').textContent = `${proximoDefinidor} escolhe a palavra e ${proximoAdidvinhador} tenta adivinhar a palavra <br/><br/>Digite a palavra secreta:`;
+
+        document.getElementById('info-partida').style.display = 'none';
+        svgFlor.style.display = 'none';
+        dicaDiv.style.display = 'none';
+        palavraDiv.style.display = 'none';
+        mensagemDiv.style.display = 'none';
+        btnReiniciar.style.display = 'none';
+        btnContinuar.style.display = 'none';
+        tentativas.style.display = 'none';
+    }
+});
+
+btnReiniciar.addEventListener('click', () => {
+    palavrasUsadas.clear(); //limpa as palavras usadas
+    if (modoJogo === 'solo') {
+        if (jogadorSolo.nome && jogadorSolo.pontuacao > 0) {
+            const confirmar = confirm(`Fim de jogo! Sua pontuação final foi ${jogadorSolo.pontuacao}. Deseja salvar no ranking?`);
+            if (confirmar) {
+                salvarPontuacao(jogadorSolo.nome, jogadorSolo.pontuacao, modoJogo);
+            }
+        }
+    } else if (modoJogo === 'dois') {
+        let vencedor;
+        if (jogador1.pontuacao > jogador2.pontuacao) {
+            vencedor = jogador1;
+        } else if (jogador2.pontuacao > jogador1.pontuacao) {
+            vencedor = jogador2;
+        }
+
+        if (vencedor) {
+            alert(`A sessão terminou! O grande vencedor é ${vencedor.nome} com ${vencedor.pontuacao} pontos!`);
+            const confirmar = confirm("Deseja salvar a pontuação do vencedor no ranking?");
+            if (confirmar) {
+                salvarPontuacao(vencedor.nome, vencedor.pontuacao, modoJogo);
+            }
+        } else {
+            alert(`A sessão terminou em empate com ${jogador1.pontuacao} pontos! Nenhuma pontuação será salva.`);
+        }
+    }
+    location.reload(); 
+});
+
 // ==================================================================
-// LÓGICA PRINCIPAL DO JOGO (GAME LOOP)
+// logica principal do jogo (game loop)
 // ==================================================================
 
 function iniciarJogo() {
     erros = 0;
     letrasCorretas = new Set();
-    letrasUsadas = new Set(); // Limpa as letras usadas no início de cada rodada
-    atualizarLetrasUsadas(); // Limpa o display visualmente
+    letrasUsadas = new Set(); 
+    atualizarLetrasUsadas(); 
     
-    document.getElementById('gameArea').style.display = 'block'; // <<< ADICIONE ESTA LINHA
-
-    document.getElementById('info-partida').style.display = 'flex';
-    document.getElementById('letras-usadas-container').style.display = 'flex';
-
+    gameArea.style.display = 'block';
+    infoPartida.style.display = 'flex';
+    letrasUsadasContainer.style.display = 'flex';
 
     if (modoJogo === 'solo') {
-        document.getElementById('placar-j1').textContent = `${jogadorSolo.nome}: ${jogadorSolo.pontuacao}`;
-        document.getElementById('placar-j2').textContent = '';
+        placarJ1.textContent = `${jogadorSolo.nome}: ${jogadorSolo.pontuacao}`;
+        placarJ2.textContent = '';
     } else {
-        document.getElementById('placar-j1').textContent = `${jogador1.nome}: ${jogador1.pontuacao}`;
-        document.getElementById('placar-j2').textContent = `${jogador2.nome}: ${jogador2.pontuacao}`;
+        placarJ1.textContent = `${jogador1.nome}: ${jogador1.pontuacao}`;
+        placarJ2.textContent = `${jogador2.nome}: ${jogador2.pontuacao}`;
     }
 
     svgFlor.style.display = 'block';
@@ -212,27 +286,37 @@ function iniciarJogo() {
     iniciarTimer();
 }
 
-// NOVA FUNÇÃO
 function atualizarLetrasUsadas() {
-    const display = document.getElementById('letras-usadas');
-    display.innerHTML = ''; // Limpa o display
+    displayLetrasUsadas.innerHTML = ''; 
     
-    // Pega as letras do Set, ordena alfabeticamente e exibe
+    // pega as letras do set, ordena alfabeticamente e exibe
     Array.from(letrasUsadas).sort().forEach(letra => {
         const span = document.createElement('span');
         span.textContent = letra;
-        display.appendChild(span);
+        displayLetrasUsadas.appendChild(span);
     });
 }
 
-// SUBSTITUÍDA: A antiga 'letraClicada' agora é 'verificarLetra'
+function sortearPalavraNova() {
+  if (palavrasUsadas.size === bancoPalavras.length) {
+    return null;  // sinaliza que não tem mais palavra para sortear
+  }
+  let escolha;
+  do {
+    escolha = bancoPalavras[Math.floor(Math.random() * bancoPalavras.length)];
+  } while (palavrasUsadas.has(escolha.palavra));
+  palavrasUsadas.add(escolha.palavra);
+  return escolha;
+}
+
+
+
 function verificarLetra(letra) {
     if (palavraSecreta.includes(letra)) {
         letrasCorretas.add(letra);
         mostrarPalavra();
         
         if (ganhou()) {
-            // ... a lógica de vitória continua EXATAMENTE a mesma de antes
             pararTimer();
             const pontosDaRodada = Math.max(10, 50 - (erros * 10) + (tempoRestante * 2));
             if (modoJogo === 'solo') {
@@ -252,7 +336,6 @@ function verificarLetra(letra) {
             finalizarJogo();
         }
     } else {
-        // ... a lógica de erro continua EXATAMENTE a mesma de antes
         erros++;
         sumirPetala(erros);
         tentativas.textContent = `Pétalas restantes: ${maxErros - erros}`;
@@ -285,66 +368,10 @@ function finalizarJogo() {
     btnContinuar.style.display = 'inline-block';
 }
 
-btnContinuar.addEventListener('click', () => {
-    if (modoJogo === 'solo') {
-        const escolha = bancoPalavras[Math.floor(Math.random() * bancoPalavras.length)];
-        palavraSecreta = escolha.palavra.toUpperCase().replace(/\s+/g, '-');
-        dica = escolha.dica;
-        iniciarJogo();
-    } else if (modoJogo === 'dois') {
-        definidorDaPalavra = definidorDaPalavra === 1 ? 2 : 1; 
-        inputPalavra.value = '';
-        inputDica.value = '';
-        formDoisJogadores.style.display = 'flex';
-
-        document.getElementById('gameArea').style.display = 'none';
-        
-        const proximoDefinidor = definidorDaPalavra === 1 ? jogador1.nome : jogador2.nome;
-        document.querySelector('#form-dois-jogadores label[for="input-palavra"]').textContent = `Vez de ${proximoDefinidor}: Digite a palavra secreta:`;
-
-        document.getElementById('info-partida').style.display = 'none';
-        svgFlor.style.display = 'none';
-        dicaDiv.style.display = 'none';
-        palavraDiv.style.display = 'none';
-        mensagemDiv.style.display = 'none';
-        btnReiniciar.style.display = 'none';
-        btnContinuar.style.display = 'none';
-        tentativas.style.display = 'none';
-    }
-});
-
-btnReiniciar.addEventListener('click', () => {
-    if (modoJogo === 'solo') {
-        if (jogadorSolo.nome && jogadorSolo.pontuacao > 0) {
-            const confirmar = confirm(`Fim de jogo! Sua pontuação final foi ${jogadorSolo.pontuacao}. Deseja salvar no ranking?`);
-            if (confirmar) {
-                salvarPontuacao(jogadorSolo.nome, jogadorSolo.pontuacao, modoJogo);
-            }
-        }
-    } else if (modoJogo === 'dois') {
-        let vencedor;
-        if (jogador1.pontuacao > jogador2.pontuacao) {
-            vencedor = jogador1;
-        } else if (jogador2.pontuacao > jogador1.pontuacao) {
-            vencedor = jogador2;
-        }
-
-        if (vencedor) {
-            alert(`A sessão terminou! O grande vencedor é ${vencedor.nome} com ${vencedor.pontuacao} pontos!`);
-            const confirmar = confirm("Deseja salvar a pontuação do vencedor no ranking?");
-            if (confirmar) {
-                salvarPontuacao(vencedor.nome, vencedor.pontuacao, modoJogo);
-            }
-        } else {
-            alert(`A sessão terminou em empate com ${jogador1.pontuacao} pontos! Nenhuma pontuação será salva.`);
-        }
-    }
-    location.reload(); 
-});
 
 
 // ==================================================================
-// FUNÇÕES AUXILIARES E DE UTILIDADE
+// funções auxiliares e de utilidades
 // ==================================================================
 
 function mostrarPalavra() {
@@ -371,6 +398,13 @@ function ganhou() {
     }
     return true;
 }
+
+function atualizarNomeAdivinhador() {
+    const infoPartida = document.getElementById('info-partida');
+    let nomeAdivinhador = definidorDaPalavra === 1 ? jogador2.nome : jogador1.nome;
+    infoPartida.innerHTML = `Vez de adivinhar: <span style="color: green;">(${nomeAdivinhador})</span>`;
+}
+
 
 function mostrarPalavraCompleta() {
     let display = '';
@@ -454,5 +488,5 @@ function salvarPontuacao(nome, pontuacao, modo) {
     carregarRankings();
 }
 
-// Carrega os rankings assim que a página é aberta
+// carrega os rankings assim que a página é aberta
 document.addEventListener('DOMContentLoaded', carregarRankings);
