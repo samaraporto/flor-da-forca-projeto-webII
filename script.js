@@ -1,5 +1,5 @@
 const bancoPalavras = [
-  { palavra: "GATO", dica: "Animal que mia" },
+  /*{ palavra: "GATO", dica: "Animal que mia" },
   { palavra: "CACHORRO", dica: "Melhor amigo do homem" },
   { palavra: "CARRO", dica: "Tem quatro rodas e anda na rua" },
   { palavra: "FLOR", dica: "Planta bonita que cresce no jardim" },
@@ -41,7 +41,7 @@ const bancoPalavras = [
   { palavra: "QUADRO", dica: "Objeto na parede para desenhar ou pintar" },
   { palavra: "CHAVE", dica: "Usada para abrir portas" },
   { palavra: "GUERRA", dica: "Conflito entre países ou grupos" },
-  { palavra: "PAZ", dica: "Ausência de conflito" },
+  { palavra: "PAZ", dica: "Ausência de conflito" },*/
   { palavra: "VIAGEM", dica: "Ir para outro lugar" },
   { palavra: "CACHOEIRA", dica: "Água caindo de uma altura" },
   { palavra: "ILHA", dica: "Terra cercada por água" },
@@ -57,6 +57,8 @@ let palavraSecreta = '';
 let dica = '';
 let modoJogo = '';
 let letrasUsadas = new Set(); // <<< ADICIONE ESTA LINHA
+const palavrasUsadas = new Set();
+
 
 
 // --- Variáveis de Sessão ---
@@ -225,7 +227,20 @@ function atualizarLetrasUsadas() {
     });
 }
 
-// SUBSTITUÍDA: A antiga 'letraClicada' agora é 'verificarLetra'
+function sortearPalavraNova() {
+  if (palavrasUsadas.size === bancoPalavras.length) {
+    return null;  // sinaliza que não tem mais palavra para sortear
+  }
+  let escolha;
+  do {
+    escolha = bancoPalavras[Math.floor(Math.random() * bancoPalavras.length)];
+  } while (palavrasUsadas.has(escolha.palavra));
+  palavrasUsadas.add(escolha.palavra);
+  return escolha;
+}
+
+
+
 function verificarLetra(letra) {
     if (palavraSecreta.includes(letra)) {
         letrasCorretas.add(letra);
@@ -286,12 +301,19 @@ function finalizarJogo() {
 }
 
 btnContinuar.addEventListener('click', () => {
-    if (modoJogo === 'solo') {
-        const escolha = bancoPalavras[Math.floor(Math.random() * bancoPalavras.length)];
-        palavraSecreta = escolha.palavra.toUpperCase().replace(/\s+/g, '-');
-        dica = escolha.dica;
-        iniciarJogo();
-    } else if (modoJogo === 'dois') {
+  if (modoJogo === 'solo') {
+    const escolha = sortearPalavraNova();
+    if (!escolha) {
+      // Todas as palavras já foram usadas, encerra o jogo
+      mensagemDiv.textContent = 'Parabéns! Você já adivinhou todas as palavras disponíveis.';
+      mensagemDiv.style.color = '#004d40';
+      finalizarJogo();
+      return;
+    }
+    palavraSecreta = escolha.palavra.toUpperCase().replace(/\s+/g, '-');
+    dica = escolha.dica;
+    iniciarJogo();
+  }else if (modoJogo === 'dois') {
         definidorDaPalavra = definidorDaPalavra === 1 ? 2 : 1; 
         inputPalavra.value = '';
         inputDica.value = '';
@@ -314,6 +336,7 @@ btnContinuar.addEventListener('click', () => {
 });
 
 btnReiniciar.addEventListener('click', () => {
+    palavrasUsadas.clear(); // Limpa as palavras usadas
     if (modoJogo === 'solo') {
         if (jogadorSolo.nome && jogadorSolo.pontuacao > 0) {
             const confirmar = confirm(`Fim de jogo! Sua pontuação final foi ${jogadorSolo.pontuacao}. Deseja salvar no ranking?`);
@@ -371,6 +394,13 @@ function ganhou() {
     }
     return true;
 }
+
+function atualizarNomeAdivinhador() {
+    const infoPartida = document.getElementById('info-partida');
+    let nomeAdivinhador = definidorDaPalavra === 1 ? jogador2.nome : jogador1.nome;
+    infoPartida.innerHTML = `Vez de adivinhar: <span style="color: green;">(${nomeAdivinhador})</span>`;
+}
+
 
 function mostrarPalavraCompleta() {
     let display = '';
