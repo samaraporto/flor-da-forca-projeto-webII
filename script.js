@@ -204,7 +204,7 @@ btnContinuar.addEventListener('click', () => {
         const proximoDefinidor = definidorDaPalavra === 1 ? jogador1.nome : jogador2.nome;
         const proximoAdidvinhador = definidorDaPalavra === 1 ? jogador2.nome : jogador1.nome;
 
-        document.querySelector('#form-dois-jogadores label[for="input-palavra"]').textContent = `${proximoDefinidor} escolhe a palavra e ${proximoAdidvinhador} tenta adivinhar a palavra <br/><br/>Digite a palavra secreta:`;
+        document.querySelector('#form-dois-jogadores label[for="input-palavra"]').innerHTML = `${proximoDefinidor} escolhe a palavra e ${proximoAdidvinhador} tenta adivinhar a palavra <br/><br/>Digite a palavra secreta:`;
 
         document.getElementById('info-partida').style.display = 'none';
         svgFlor.style.display = 'none';
