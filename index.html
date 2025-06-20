@@ -9,16 +9,30 @@
 <body>
 
   <div class="container">
-    <h1>🌸 Flor da Forca 🌻</h1>
-
-    <!-- Tela inicial com opção solo ou dois jogadores -->
     <div id="tela-inicial">
+      <h1>🌸 Flor da Forca 🌻</h1>
+
       <h2>Escolha o modo de jogo:</h2>
       <button id="btn-solo">1 Jogador</button>
       <button id="btn-dois">2 Jogadores</button>
+      
+      <div id="rankings">
+          <div class="ranking-container">
+              <h3>🏆 Ranking - 1 Jogador</h3>
+              <ol id="lista-ranking-solo">
+                  <li>Nenhum registro ainda</li>
+              </ol>
+          </div>
+          <div class="ranking-container">
+              <h3>🏆 Ranking - 2 Jogadores</h3>
+              <ol id="lista-ranking-dois">
+                  <li>Nenhum registro ainda</li>
+              </ol>
+          </div>
+      </div>
     </div>
 
-    <!-- Formulário para palavra e dica 2 jogadores -->
+    <!-- formulário para palavra e dica 2 jogadores -->
     <div class="two-players">
       <form id="form-dois-jogadores" aria-label="Formulário para palavra e dica do jogo dois jogadores">
         <label for="input-palavra">Digite a palavra secreta:</label>
@@ -29,23 +43,27 @@
       </form>
     </div>
 
-
     <div id="gameArea" >
+      <div id="info-partida" style="display: none;">
+          <span id="placar-j1">Jogador 1: 0</span>
+          <span id="info-timer">Tempo: ⏳</span>
+          <span id="placar-j2">Jogador 2: 0</span>
+      </div>
       <div class="flower-container">
         <svg viewBox="-150 -150 300 400" class="flor" aria-label="Flor com 6 pétalas e caule" style="display:none;">
-        <!-- Caule -->
-        <rect class="caule" x="-5" y="20" width="10" height="150" />
+          <!-- Caule -->
+          <rect class="caule" x="-5" y="20" width="10" height="150" />
 
-        <!-- Pétalas -->
-        <path class="petala" id="petala1" d="M0,-20 C20,-80 80,-80 60,-20 C80,-60 20,-60 0,-20 Z" transform="rotate(0)" />
-        <path class="petala" id="petala2" d="M0,-20 C20,-80 80,-80 60,-20 C80,-60 20,-60 0,-20 Z" transform="rotate(60)" />
-        <path class="petala" id="petala3" d="M0,-20 C20,-80 80,-80 60,-20 C80,-60 20,-60 0,-20 Z" transform="rotate(120)" />
-        <path class="petala" id="petala4" d="M0,-20 C20,-80 80,-80 60,-20 C80,-60 20,-60 0,-20 Z" transform="rotate(180)" />
-        <path class="petala" id="petala5" d="M0,-20 C20,-80 80,-80 60,-20 C80,-60 20,-60 0,-20 Z" transform="rotate(240)" />
-        <path class="petala" id="petala6" d="M0,-20 C20,-80 80,-80 60,-20 C80,-60 20,-60 0,-20 Z" transform="rotate(300)" />
+          <!-- Pétalas -->
+          <path class="petala" id="petala1" d="M0,-20 C20,-80 80,-80 60,-20 C80,-60 20,-60 0,-20 Z" transform="rotate(0)" />
+          <path class="petala" id="petala2" d="M0,-20 C20,-80 80,-80 60,-20 C80,-60 20,-60 0,-20 Z" transform="rotate(60)" />
+          <path class="petala" id="petala3" d="M0,-20 C20,-80 80,-80 60,-20 C80,-60 20,-60 0,-20 Z" transform="rotate(120)" />
+          <path class="petala" id="petala4" d="M0,-20 C20,-80 80,-80 60,-20 C80,-60 20,-60 0,-20 Z" transform="rotate(180)" />
+          <path class="petala" id="petala5" d="M0,-20 C20,-80 80,-80 60,-20 C80,-60 20,-60 0,-20 Z" transform="rotate(240)" />
+          <path class="petala" id="petala6" d="M0,-20 C20,-80 80,-80 60,-20 C80,-60 20,-60 0,-20 Z" transform="rotate(300)" />
 
-        <!-- Centro -->
-        <circle class="centro" cx="0" cy="0" r="20" />
+          <!-- Centro -->
+          <circle class="centro" cx="0" cy="0" r="20" />
         </svg>
       </div>
 
@@ -55,16 +73,19 @@
 
       <div id="tentativas" style="display:none;">Pétalas restantes: 6</div>
 
-      <div id="teclado" style="display:none;"></div>
+      <div id="letras-usadas-container" style="display: none;">Letras tentadas: <span id="letras-usadas"></span></div>
+
+      <div id="teclado-virtual" style="display:none;"></div>
 
       <div id="mensagem" style="display:none;"></div>
 
       <button id="btn-continuar" style="display: none;">Continuar</button>
 
-      <button id="btn-reiniciar" style="display:none;">Reiniciar Jogo</button>
+      <button id="btn-reiniciar" style="display:none;">Voltar</button> 
+
     </div>
 
-  
+    
 <script src="script.js"></script>  
 
 </body>
