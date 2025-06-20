@@ -94,6 +94,8 @@ const letrasUsadasContainer = document.getElementById('letras-usadas-container')
 const placarJ1 = document.getElementById('placar-j1');
 const placarJ2 = document.getElementById('placar-j2');
 const displayLetrasUsadas = document.getElementById('letras-usadas');
+const teclado = document.getElementById('teclado-virtual');
+
 
 
 // ==================================================================
@@ -156,10 +158,11 @@ btnDois.addEventListener('click', () => {
 
     telaInicial.style.display = 'none';
     formDoisJogadores.style.display = 'flex';
+    btnReiniciar.style.display = 'inline-block';
     
     const labelPalavra = document.querySelector('#form-dois-jogadores label[for="input-palavra"]');
     labelPalavra.textContent = `Vez de ${jogador1.nome}: Digite a palavra secreta:`;
-    labelPalavra.innerHTML = `${jogador1.nome} escolhe a palavra e ${jogador2.nome} tenta adivinhar a palavra <br/><br/>Digite a palavra secreta:`;
+    labelPalavra.innerHTML = `${jogador1.nome} escolhe a palavra e ${jogador2.nome} tenta adivinhar a palavra <br/><br/>${jogador1.nome}, digite a palavra secreta:`;
 
 });
 
@@ -177,6 +180,7 @@ formDoisJogadores.addEventListener('submit', (e) => {
     dica = dicaInput;
     iniciarJogo();
     formDoisJogadores.style.display = 'none';
+    btnReiniciar.style.display = 'inline-block';
 });
 
 
@@ -199,25 +203,34 @@ btnContinuar.addEventListener('click', () => {
         inputDica.value = '';
         formDoisJogadores.style.display = 'flex';
 
-        gameArea.style.display = 'none';
+        //gameArea.style.display = 'none';
+        btnReiniciar.style.display = 'inline-block';
         
         const proximoDefinidor = definidorDaPalavra === 1 ? jogador1.nome : jogador2.nome;
         const proximoAdidvinhador = definidorDaPalavra === 1 ? jogador2.nome : jogador1.nome;
 
-        document.querySelector('#form-dois-jogadores label[for="input-palavra"]').innerHTML = `${proximoDefinidor} escolhe a palavra e ${proximoAdidvinhador} tenta adivinhar a palavra <br/><br/>Digite a palavra secreta:`;
+        document.querySelector('#form-dois-jogadores label[for="input-palavra"]').innerHTML = `${proximoDefinidor} escolhe a palavra e ${proximoAdidvinhador} tenta adivinhar a palavra <br/><br/>${proximoDefinidor}, digite a palavra secreta:`;
 
         document.getElementById('info-partida').style.display = 'none';
         svgFlor.style.display = 'none';
         dicaDiv.style.display = 'none';
         palavraDiv.style.display = 'none';
         mensagemDiv.style.display = 'none';
-        btnReiniciar.style.display = 'none';
         btnContinuar.style.display = 'none';
         tentativas.style.display = 'none';
+        btnReiniciar.style.display = 'inline-block';
+
     }
 });
 
 btnReiniciar.addEventListener('click', () => {
+    if (formDoisJogadores.style.display === 'flex') {
+        // Se estiver no form, volta pra tela inicial sem reload
+        formDoisJogadores.style.display = 'none';
+        telaInicial.style.display = 'block';
+        btnReiniciar.style.display = 'inline-block';
+        return;
+    }
     palavrasUsadas.clear(); //limpa as palavras usadas
     if (modoJogo === 'solo') {
         if (jogadorSolo.nome && jogadorSolo.pontuacao > 0) {
@@ -284,6 +297,7 @@ function iniciarJogo() {
 
     mostrarPalavra();
     iniciarTimer();
+    criarTecladoVirtual();
 }
 
 function atualizarLetrasUsadas() {
@@ -366,6 +380,14 @@ function finalizarJogo() {
     tentativas.style.display = 'none';
     btnReiniciar.style.display = 'inline-block';
     btnContinuar.style.display = 'inline-block';
+    letrasUsadasContainer.style.display = 'none';
+    teclado.style.display = 'none';
+    if (modoJogo === 'solo') {
+        placarJ1.textContent = `${jogadorSolo.nome}: ${jogadorSolo.pontuacao}`;
+    } else {
+        placarJ1.textContent = `${jogador1.nome}: ${jogador1.pontuacao}`;
+        placarJ2.textContent = `${jogador2.nome}: ${jogador2.pontuacao}`;
+    }
 }
 
 
@@ -413,6 +435,31 @@ function mostrarPalavraCompleta() {
     }
     palavraDiv.textContent = display.trim();
 }
+
+function criarTecladoVirtual() {
+    const tecladoDiv = document.getElementById('teclado-virtual');
+    tecladoDiv.innerHTML = ''; // Limpa se já existir algo
+
+    const letras = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+
+    letras.forEach(letra => {
+        const botao = document.createElement('button');
+        botao.textContent = letra;
+        botao.classList.add('tecla-virtual');
+        botao.addEventListener('click', () => {
+            if (!letrasUsadas.has(letra)) {
+                letrasUsadas.add(letra);
+                atualizarLetrasUsadas();
+                verificarLetra(letra);
+                botao.disabled = true; // Desabilita a tecla depois de clicada
+            }
+        });
+        tecladoDiv.appendChild(botao);
+    });
+
+    tecladoDiv.style.display = 'flex';
+}
+
 
 // ==================================================================
 // FUNÇÕES DE TIMER

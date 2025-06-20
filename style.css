@@ -67,7 +67,7 @@ svg {
 #palavra {
     font-size: 28px;
     letter-spacing: 10px;
-    margin-bottom: 30px;
+    margin-bottom: 5px;
     user-select: none;
 }
 
@@ -90,7 +90,7 @@ svg {
     background-color: #fcc633;
     color: rgb(62, 62, 62);
     cursor: pointer;
-    display: none;
+    display: inline-block;
     user-select: none;
     transition: background-color 0.3s ease;
 }
@@ -279,7 +279,6 @@ svg {
 
 /* NOVO: Estilos para o display de letras usadas */
 #letras-usadas-container {
-    margin-top: 20px;
     padding: 10px;
     min-height: 40px;
     display: flex;
@@ -298,16 +297,33 @@ svg {
     font-weight: bold;
     font-size: 1.1em;
 }
-/* NOVAS REGRAS PARA O RODAPÉ DO JOGO */
-#game-footer {
-    margin-top: auto;  /* A MÁGICA ACONTECE AQUI! */
-    padding-top: 15px; /* Um respiro entre o jogo e o rodapé */
-    flex-shrink: 0;    /* Impede que o rodapé seja esmagado */
+
+#teclado-virtual {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 20px;
+    max-width: 600px;
 }
 
-#game-footer > div {
-    /* Garante que o container dos botões também seja centralizado */
-    display: flex;
-    justify-content: center;
-    gap: 10px;
+.tecla-virtual {
+    padding: 10px 15px;
+    font-size: 18px;
+    border: 1px solid #888;
+    border-radius: 5px;
+    background-color: #f0f0f0;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.3s ease;
+}
+
+.tecla-virtual:hover {
+    background-color: #dcdcdc;
+}
+
+.tecla-virtual:disabled {
+    background-color: #ccc;
+    color: #999;
+    cursor: not-allowed;
 }
