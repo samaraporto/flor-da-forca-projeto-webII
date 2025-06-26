@@ -155,9 +155,7 @@ const teclado = document.getElementById('teclado-virtual');
 
 
 
-// ==================================================================
 // inicio do jogo e seleção do modo
-// ==================================================================
 
 // event listener para o teclado físico
 document.addEventListener('keydown', (e) => {
@@ -168,17 +166,11 @@ document.addEventListener('keydown', (e) => {
     const letra = e.key.toUpperCase();
 
     if (letra.length === 1 && letra >= 'A' && letra <= 'Z') {
-        
-        // se a letra já foi usada, não faz nada
         if (letrasUsadas.has(letra)) {
             return;
         }
-
-        // adiciona a letra ao conjunto de usadas e atualiza o display
         letrasUsadas.add(letra);
         atualizarLetrasUsadas();
-
-        // roda a lógica do jogo com a nova letra
         verificarLetra(letra);
     }
 });
@@ -320,7 +312,6 @@ btnReiniciar.addEventListener('click', () => {
         }
     }
 
-    // Se o botão foi clicado enquanto estava no formulário
     if (formDoisJogadores.style.display === 'flex') {
         formDoisJogadores.style.display = 'none';
         telaInicial.style.display = 'block';
@@ -328,15 +319,12 @@ btnReiniciar.addEventListener('click', () => {
         return;
     }
 
-    // Recarrega a página para resetar tudo
     location.reload();
 });
 
 
 
-// ==================================================================
 // logica principal do jogo (game loop)
-// ==================================================================
 
 function iniciarJogo() {
     erros = 0;
@@ -376,7 +364,6 @@ function iniciarJogo() {
 
 function atualizarLetrasUsadas() {
     displayLetrasUsadas.innerHTML = ''; 
-    
     // pega as letras do set, ordena alfabeticamente e exibe
     Array.from(letrasUsadas).sort().forEach(letra => {
         const span = document.createElement('span');
@@ -396,8 +383,6 @@ function sortearPalavraNova() {
   palavrasUsadas.add(escolha.palavra);
   return escolha;
 }
-
-
 
 function verificarLetra(letra) {
     if (palavraSecreta.includes(letra)) {
@@ -474,12 +459,7 @@ function finalizarJogo() {
     falar("Partida finalizada!");
 }
 
-
-
-// ==================================================================
 // funções auxiliares e de utilidades
-// ==================================================================
-
 function mostrarPalavra() {
     let display = '';
     for (let letra of palavraSecreta) {
@@ -515,7 +495,7 @@ function mostrarPalavraCompleta() {
 
 function criarTecladoVirtual() {
     const tecladoDiv = document.getElementById('teclado-virtual');
-    tecladoDiv.innerHTML = ''; // Limpa se já existir algo
+    tecladoDiv.innerHTML = ''; 
 
     const letras = 'ABCDEFGHIJKLMNOPQRSTUVWXYZÁÉÍÓÚÂÊÔÃÕÇ'.split('');
 
@@ -528,7 +508,7 @@ function criarTecladoVirtual() {
                 letrasUsadas.add(letra);
                 atualizarLetrasUsadas();
                 verificarLetra(letra);
-                botao.disabled = true; // Desabilita a tecla depois de clicada
+                botao.disabled = true; 
             }
         });
         tecladoDiv.appendChild(botao);
@@ -538,9 +518,7 @@ function criarTecladoVirtual() {
 }
 
 
-// ==================================================================
 // FUNÇÕES DE TIMER
-// ==================================================================
 
 function iniciarTimer() {
     tempoRestante = Math.max(25, palavraSecreta.replace(/-/g, '').length * 4);
@@ -577,9 +555,7 @@ function pararTimer() {
     clearInterval(timer);
 }
 
-// ==================================================================
 // FUNÇÕES DE RANKING (localStorage)
-// ==================================================================
 
 function carregarRankings() {
     const rankingSolo = JSON.parse(localStorage.getItem('rankingSolo')) || [];
@@ -618,7 +594,6 @@ function falar(texto) {
   caixaFala.textContent = texto;
   caixaFala.style.opacity = 1;
 }
-
 
 // carrega os rankings assim que a página é aberta
 document.addEventListener('DOMContentLoaded', carregarRankings);
