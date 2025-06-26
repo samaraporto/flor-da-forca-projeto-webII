@@ -3,14 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Jogo da Forca - Flor de 6 Pétalas</title>
+  <title>Jogo da Forca</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+  <div id="mascote">
+    <img src="img/mascote.png" alt="Mascote" id="img-mascote" />
+    <div id="fala-mascote">Vamos brincar!</div>
+  </div>
+
   <div class="container">
     <div id="tela-inicial">
-      <h1>🌸 Flor da Forca 🌻</h1>
+      <h1>🌸 Jogo das Pétalas 🌻</h1>
 
       <h2>Escolha o modo de jogo:</h2>
       <button id="btn-solo">1 Jogador</button>
@@ -36,7 +41,7 @@
     <div class="two-players">
       <form id="form-dois-jogadores" aria-label="Formulário para palavra e dica do jogo dois jogadores">
         <label for="input-palavra">Digite a palavra secreta:</label>
-        <input type="text" id="input-palavra" maxlength="20" autocomplete="off" required pattern="[a-zA-ZÀ-ÿ\s\-]+" title="Apenas letras, espaços e hífens"/>
+        <input type="password" id="input-palavra" maxlength="20" autocomplete="off" required pattern="[a-zA-ZÀ-ÿ\s\-]+" title="Apenas letras, espaços e hífens"/>
         <label for="input-dica">Digite uma dica para a palavra:</label>
         <textarea id="input-dica" rows="3" maxlength="100" required></textarea>
         <button type="submit">Começar Jogo</button>
@@ -87,6 +92,7 @@
 
     
 <script src="script.js"></script>  
+  
 
 </body>
 </html>

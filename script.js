@@ -212,11 +212,12 @@ btnDois.addEventListener('click', () => {
     jogador2 = { nome: nomeJ2.trim().toUpperCase(), pontuacao: 0 };
     definidorDaPalavra = 1;
     modoJogo = 'dois';
+    falar(`Bem-vindos ${jogador1.nome} e ${jogador2.nome}! Vamos começar o jogo!`);
 
     telaInicial.style.display = 'none';
     formDoisJogadores.style.display = 'flex';
-    btnReiniciar.style.display = 'inline-block';
-    
+    inputPalavra.focus();
+
     const labelPalavra = document.querySelector('#form-dois-jogadores label[for="input-palavra"]');
     labelPalavra.textContent = `Vez de ${jogador1.nome}: Digite a palavra secreta:`;
     labelPalavra.innerHTML = `${jogador1.nome} escolhe a palavra e ${jogador2.nome} tenta adivinhar a palavra <br/><br/>${jogador1.nome}, digite a palavra secreta:`;
@@ -238,6 +239,7 @@ formDoisJogadores.addEventListener('submit', (e) => {
     iniciarJogo();
     formDoisJogadores.style.display = 'none';
     btnReiniciar.style.display = 'inline-block';
+    falar(`Pronto! Agora é a vez do ${definidorDaPalavra === 1 ? jogador2.nome : jogador1.nome} adivinhar a palavra!`);
 });
 
 
@@ -249,25 +251,27 @@ btnContinuar.addEventListener('click', () => {
       mensagemDiv.textContent = 'Parabéns! Você já adivinhou todas as palavras disponíveis.';
       mensagemDiv.style.color = '#004d40';
       finalizarJogo();
+      falar("Você já adivinhou todas as palavras disponíveis! Que tal jogar novamente? 🎉");
       return;
     }
     palavraSecreta = escolha.palavra.toUpperCase().replace(/\s+/g, '-');
     dica = escolha.dica;
+    falar(`Pronto! Vamos continuar!`);
     iniciarJogo();
   }else if (modoJogo === 'dois') {
         definidorDaPalavra = definidorDaPalavra === 1 ? 2 : 1; 
         inputPalavra.value = '';
         inputDica.value = '';
         formDoisJogadores.style.display = 'flex';
+        falar(`Agora é a vez do ${definidorDaPalavra === 1 ? jogador1.nome : jogador2.nome} escolher a palavra!`);
 
-        //gameArea.style.display = 'none';
-        btnReiniciar.style.display = 'inline-block';
+        gameArea.style.display = 'none';
         
         const proximoDefinidor = definidorDaPalavra === 1 ? jogador1.nome : jogador2.nome;
         const proximoAdidvinhador = definidorDaPalavra === 1 ? jogador2.nome : jogador1.nome;
 
         document.querySelector('#form-dois-jogadores label[for="input-palavra"]').innerHTML = `${proximoDefinidor} escolhe a palavra e ${proximoAdidvinhador} tenta adivinhar a palavra <br/><br/>${proximoDefinidor}, digite a palavra secreta:`;
-
+        inputPalavra.focus();
         document.getElementById('info-partida').style.display = 'none';
         svgFlor.style.display = 'none';
         dicaDiv.style.display = 'none';
@@ -281,7 +285,7 @@ btnContinuar.addEventListener('click', () => {
 });
 
 btnReiniciar.addEventListener('click', () => {
-    palavrasUsadas.clear(); // limpa as palavras usadas
+    palavrasUsadas.clear(); 
 
     if (modoJogo === 'solo') {
         if (jogadorSolo.nome && jogadorSolo.pontuacao > 0) {
@@ -399,6 +403,7 @@ function verificarLetra(letra) {
     if (palavraSecreta.includes(letra)) {
         letrasCorretas.add(letra);
         mostrarPalavra();
+        falar("Boa! Você acertou uma letra! 🎉");
         
         if (ganhou()) {
             pararTimer();
@@ -406,6 +411,8 @@ function verificarLetra(letra) {
             if (modoJogo === 'solo') {
                 jogadorSolo.pontuacao += pontosDaRodada;
                 mensagemDiv.textContent = `Você ganhou! +${pontosDaRodada} pontos!`;
+                falar("Parabéns! Você acertou toda a palavra! 🏆");
+
             } else {
                 if (definidorDaPalavra === 1) { 
                     jogador2.pontuacao += pontosDaRodada;
@@ -423,11 +430,17 @@ function verificarLetra(letra) {
         erros++;
         sumirPetala(erros);
         tentativas.textContent = `Pétalas restantes: ${maxErros - erros}`;
+        falar("Ops! Essa letra não está na palavra. 😬");
+
         if (erros >= maxErros) {
             pararTimer();
             if (modoJogo === 'solo') {
                 mensagemDiv.textContent = 'Você perdeu! A palavra era: ' + palavraSecreta;
+                falar("Ah não! Você perdeu essa. Vamos tentar outra? 💀");
+
             } else {
+                falar(`${definidorDaPalavra === 1 ? jogador1.nome : jogador2.nome} venceu esta rodada! 🥳`);
+
                 const pontosDaRodada = 50;
                 if (definidorDaPalavra === 1) {
                     jogador1.pontuacao += pontosDaRodada;
@@ -458,6 +471,7 @@ function finalizarJogo() {
         placarJ1.textContent = `${jogador1.nome}: ${jogador1.pontuacao}`;
         placarJ2.textContent = `${jogador2.nome}: ${jogador2.pontuacao}`;
     }
+    falar("Partida finalizada!");
 }
 
 
@@ -490,13 +504,6 @@ function ganhou() {
     }
     return true;
 }
-
-function atualizarNomeAdivinhador() {
-    const infoPartida = document.getElementById('info-partida');
-    let nomeAdivinhador = definidorDaPalavra === 1 ? jogador2.nome : jogador1.nome;
-    infoPartida.innerHTML = `Vez de adivinhar: <span style="color: green;">(${nomeAdivinhador})</span>`;
-}
-
 
 function mostrarPalavraCompleta() {
     let display = '';
@@ -604,6 +611,14 @@ function salvarPontuacao(nome, pontuacao, modo) {
     localStorage.setItem(chaveRanking, JSON.stringify(ranking));
     carregarRankings();
 }
+
+// ==== MASCOTE FALANTE ====
+function falar(texto) {
+  const caixaFala = document.getElementById('fala-mascote');
+  caixaFala.textContent = texto;
+  caixaFala.style.opacity = 1;
+}
+
 
 // carrega os rankings assim que a página é aberta
 document.addEventListener('DOMContentLoaded', carregarRankings);
