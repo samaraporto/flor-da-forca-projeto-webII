@@ -4,7 +4,7 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background-color: #c1ffc1; /* Verde clarinho */
+    background-color: #c1ffc1; 
     margin: 0;
     color: #333;
     text-align: center;
@@ -30,7 +30,7 @@ h1 {
 }
 
 h2 {
-    color: #4CAF50; /* Verde escuro */
+    color: #4CAF50; 
     margin-bottom: 15px;
 }
 
@@ -100,7 +100,7 @@ svg {
 }
 
 #tela-inicial button {
-    background-color: #ffb6c1; /* Rosa claro */
+    background-color: #ffb6c1; 
     color: #5c3c3c;
     border: none;
     padding: 12px 25px;
@@ -115,7 +115,7 @@ svg {
     background-color: #ff8da1;
 }
 
-/* Formulário para 2 jogadores */
+/* formulário para 2 jogadores */
 #form-dois-jogadores {
     display: none;
     flex-direction: column;
@@ -169,7 +169,7 @@ svg {
     gap: 20px;
 }
 
-/* Área do Jogo */
+/* area do Jogo */
 .flower-container {
     display: flex;
     justify-content: center;
@@ -188,7 +188,7 @@ svg {
     color: rgb(130, 130, 130);
 }
 
-/* Estilos para a seção de Ranking */
+/* estilos para a seção de ranking */
 #rankings {
     display: flex;
     justify-content: space-around;
@@ -226,22 +226,22 @@ svg {
     font-size: 0.95em;
 }
 
-/* Estilos para as Informações da Partida */
+/* estilos para as Informações da Partida */
 #info-partida {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 10px 20px;
-    background-color: #e0f2f1; /* Um tom de verde-água claro */
+    background-color: #e0f2f1;
     border-radius: 8px;
     margin-bottom: 20px;
     font-size: 1.1em;
     font-weight: bold;
-    color: #004d40; /* Verde escuro */
+    color: #004d40; 
 }
 
 #info-timer {
-    background-color: #ffc107; /* Amarelo âmbar */
+    background-color: #ffc107;
     color: #333;
     padding: 5px 10px;
     border-radius: 5px;
@@ -260,24 +260,21 @@ svg {
     text-align: right;
 }
 
-/* NOVO */
 #gameArea {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    flex-grow: 1; /* Faz a área do jogo ocupar todo o espaço vertical disponível */
-    min-height: 0; /* Truque necessário para o flex-grow funcionar corretamente em alguns casos */
+    flex-grow: 1; 
+    min-height: 0; 
 }
 
-/* NOVO */
 .flower-container {
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-/* NOVO: Estilos para o display de letras usadas */
 #letras-usadas-container {
     padding: 10px;
     min-height: 40px;
@@ -326,4 +323,61 @@ svg {
     background-color: #ccc;
     color: #999;
     cursor: not-allowed;
+}
+/* animação */
+@keyframes cairPetala {
+  0% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(300px) rotate(720deg); opacity: 0; }
+}
+.petala-voando {
+  animation: cairPetala 1s ease forwards;
+}
+
+/* mascote */
+#mascote {
+  width: 250px; 
+  height: auto;
+  position: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20px;
+  left: 20px;
+  bottom: 20px;
+  width: 150px;
+  z-index: 1000;
+  text-align: center;
+}
+
+#mascote img {
+  width: 350px; 
+  height: auto; 
+  margin-left: 200px;
+  object-fit: contain;
+}
+
+#fala-mascote {
+  background-color: #fff8dc;
+  border: 2px solid #f1c40f;
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 10px;
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+  font-size: 14px;
+  color: #444;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  opacity: 1;
+  transition: opacity 0.3s;
+}
+
+body {
+  background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #fbc2eb, #a1c4fd, #4CAF50, #ff6f91, #ff3030, #d2e941);
+  background-size: 400% 400%;
+  animation: gradiente 10s ease infinite;
+}
+
+@keyframes gradiente {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
